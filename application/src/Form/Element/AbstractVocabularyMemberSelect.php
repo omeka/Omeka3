@@ -53,6 +53,8 @@ abstract class AbstractVocabularyMemberSelect extends Select implements EventMan
             $query['sort_by'] = 'label';
         }
 
+        $showOnlyUsedOptions = $this->getOption('showOnlyUsedOptions');
+
         $args = $events->prepareArgs(['query' => $query]);
         $events->trigger('form.vocab_member_select.query', $this, $args);
         $query = $args['query'];
@@ -60,25 +62,42 @@ abstract class AbstractVocabularyMemberSelect extends Select implements EventMan
         $valueOptions = [];
         $response = $this->getApiManager()->search($resourceName, $query);
         foreach ($response->getContent() as $member) {
+            $isOptionUsedQuery['limit'] = 1;
+
             $attributes = ['data-term' => $member->term()];
             if ('properties' === $resourceName) {
                 $attributes['data-property-id'] = $member->id();
+                $isOptionUsedQuery['property'][0]['joiner'] = 'and';
+                $isOptionUsedQuery['property'][0]['property'] = $member->id();
+                $isOptionUsedQuery['property'][0]['type'] = 'ex';
             } elseif ('resource_classes' === $resourceName) {
                 $attributes['data-resource-class-id'] = $member->id();
+                $isOptionUsedQuery['resource_class_id'] = $member->id();
             }
-            $option = [
-                'label' => $member->label(),
-                'value' => $termAsValue ? $member->term() : $member->id(),
-                'attributes' => $attributes,
-            ];
-            $vocabulary = $member->vocabulary();
-            if (!isset($valueOptions[$vocabulary->prefix()])) {
-                $valueOptions[$vocabulary->prefix()] = [
-                    'label' => $vocabulary->label(),
-                    'options' => [],
+
+            // Check if the option is used in any resource before adding
+            $isOptionUsed = null;
+
+            if ($showOnlyUsedOptions) {
+                $isOptionUsed = $this->getApiManager()->search('items', $isOptionUsedQuery)->getContent();
+            }
+
+            if ($isOptionUsed || !$showOnlyUsedOptions) {
+                $option = [
+                    'label' => $member->label(),
+                    'value' => $termAsValue ? $member->term() : $member->id(),
+                    'attributes' => $attributes,
                 ];
+                $vocabulary = $member->vocabulary();
+                if (!isset($valueOptions[$vocabulary->prefix()])) {
+                    $valueOptions[$vocabulary->prefix()] = [
+                        'label' => $vocabulary->label(),
+                        'options' => [],
+                    ];
+                }
+
+                $valueOptions[$vocabulary->prefix()]['options'][] = $option;
             }
-            $valueOptions[$vocabulary->prefix()]['options'][] = $option;
         }
 
         // Move Dublin Core vocabularies (dcterms & dctype) to the beginning.

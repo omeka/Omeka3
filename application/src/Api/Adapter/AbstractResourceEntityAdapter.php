@@ -188,6 +188,12 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter
      *     - nin: does not contain
      *     - ex: has any value
      *     - nex: has no value
+     *     - sw: starts with
+     *     - nsw: does not start with
+     *     - ew: ends with
+     *     - new: does not end with
+     *     - res: has resource
+     *     - nres: has no resource
      *
      * @param QueryBuilder $qb
      * @param array $query
@@ -222,6 +228,7 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter
             switch ($queryType) {
                 case 'neq':
                     $positive = false;
+                    // No break.
                 case 'eq':
                     $param = $this->createNamedParameter($qb, $value);
                     $predicateExpr = $qb->expr()->orX(
@@ -229,8 +236,10 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter
                         $qb->expr()->eq("$valuesAlias.uri", $param)
                     );
                     break;
+
                 case 'nin':
                     $positive = false;
+                    // No break.
                 case 'in':
                     $param = $this->createNamedParameter($qb, "%$value%");
                     $predicateExpr = $qb->expr()->orX(
@@ -238,19 +247,46 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter
                         $qb->expr()->like("$valuesAlias.uri", $param)
                     );
                     break;
+
+                case 'nsw':
+                    $positive = false;
+                    // No break.
+                case 'sw':
+                    $param = $this->createNamedParameter($qb, "$value%");
+                    $predicateExpr = $qb->expr()->orX(
+                        $qb->expr()->like("$valuesAlias.value", $param),
+                        $qb->expr()->like("$valuesAlias.uri", $param)
+                    );
+                    break;
+
+                case 'new':
+                    $positive = false;
+                    // No break.
+                case 'ew':
+                    $param = $this->createNamedParameter($qb, "%$value");
+                    $predicateExpr = $qb->expr()->orX(
+                        $qb->expr()->like("$valuesAlias.value", $param),
+                        $qb->expr()->like("$valuesAlias.uri", $param)
+                    );
+                    break;
+
                 case 'nres':
                     $positive = false;
+                    // No break.
                 case 'res':
                     $predicateExpr = $qb->expr()->eq(
                         "$valuesAlias.valueResource",
                         $this->createNamedParameter($qb, $value)
                     );
                     break;
+
                 case 'nex':
                     $positive = false;
+                    // No break.
                 case 'ex':
                     $predicateExpr = $qb->expr()->isNotNull("$valuesAlias.id");
                     break;
+
                 default:
                     continue 2;
             }

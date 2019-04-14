@@ -64,7 +64,7 @@ class Status
     /**
      * Get the route match.
      *
-     * @return Zend\Router\Http\RouteMatch
+     * @return \Zend\Router\Http\RouteMatch
      */
     public function getRouteMatch()
     {

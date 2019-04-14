@@ -155,7 +155,7 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
     /**
      * Get the thumbnail of this resource.
      *
-     * @return Asset
+     * @return AssetRepresentation
      */
     public function thumbnail()
     {

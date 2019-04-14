@@ -57,7 +57,7 @@ abstract class AbstractResource extends AbstractDataType
             $exception = new Exception\ValidationException;
             $message = new Message(
                 'A value resource cannot be Media.' // @translate
-                );
+            );
             $exception->getErrorStore()->addError(
                 'value', $message
             );

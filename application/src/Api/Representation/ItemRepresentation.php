@@ -60,6 +60,9 @@ class ItemRepresentation extends AbstractResourceEntityRepresentation
         return $itemSets;
     }
 
+    /**
+    * @return MediaRepresentation|null 
+     */
     public function primaryMedia()
     {
         // Return the first media if one exists.

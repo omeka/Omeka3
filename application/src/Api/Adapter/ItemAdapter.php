@@ -66,7 +66,6 @@ class ItemAdapter extends AbstractResourceEntityAdapter
 
                 $this->buildQuery($qb, $params);
             } catch (Exception\NotFoundException $e) {
-                $site = null;
             }
 
             if (isset($query['site_attachments_only']) && $query['site_attachments_only']) {

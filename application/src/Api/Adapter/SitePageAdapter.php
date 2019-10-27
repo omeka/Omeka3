@@ -53,19 +53,19 @@ class SitePageAdapter extends AbstractEntityAdapter implements FulltextSearchabl
 
         if (isset($query['slug'])) {
             $qb->andWhere($qb->expr()->eq(
-                'Omeka\Entity\SitePage.slug',
+                'omeka_root.slug',
                 $this->createNamedParameter($qb, $query['slug']))
             );
         }
 
         if (isset($query['site_id'])) {
-            $qb->andWhere($qb->expr()->eq('Omeka\Entity\SitePage.site', $query['site_id']));
+            $qb->andWhere($qb->expr()->eq('omeka_root.site', $query['site_id']));
         }
 
         if (isset($query['site'])) {
             $siteAlias = $this->createAlias();
             $qb->innerJoin(
-                'Omeka\Entity\SitePage.site',
+                'omeka_root.site',
                 $siteAlias
             );
             $qb->andWhere($qb->expr()->eq(

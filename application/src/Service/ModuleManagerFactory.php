@@ -134,7 +134,7 @@ class ModuleManagerFactory implements FactoryInterface
             }
         }
 
-        foreach ($manager->getModules() as $id => $module) {
+        foreach ($manager->getModules() as $module) {
             if (!$module->getState()) {
                 // Module in filesystem but not installed
                 $module->setState(ModuleManager::STATE_NOT_INSTALLED);

@@ -56,6 +56,7 @@ class Api extends AbstractPlugin
      *
      * @param string $resource
      * @param array $data
+     * @param array $options
      * @return Response
      */
     public function search($resource, $data = [], array $options = [])
@@ -74,12 +75,12 @@ class Api extends AbstractPlugin
      * @param array $options
      * @return Response
      */
-    public function searchOne($resource, $data = [], array $options = [])
+    public function searchOne($resource, array $data = [], array $options = [])
     {
         $data['limit'] = 1;
         $response = $this->search($resource, $data, $options);
         $content = $response->getContent();
-        $content = is_array($content) && count($content) ? $content[0] : null;
+        $content = is_array($content) && count($content) ? reset($content) : null;
         $response->setContent($content);
         return $response;
     }

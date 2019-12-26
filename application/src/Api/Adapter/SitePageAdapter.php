@@ -50,6 +50,29 @@ class SitePageAdapter extends AbstractEntityAdapter implements FulltextSearchabl
                 $this->createNamedParameter($qb, $query['site_id']))
             );
         }
+
+        if (isset($query['slug'])) {
+            $qb->andWhere($qb->expr()->eq(
+                'omeka_root.slug',
+                $this->createNamedParameter($qb, $query['slug']))
+            );
+        }
+
+        if (isset($query['site_id'])) {
+            $qb->andWhere($qb->expr()->eq('omeka_root.site', $query['site_id']));
+        }
+
+        if (isset($query['site'])) {
+            $siteAlias = $this->createAlias();
+            $qb->innerJoin(
+                'omeka_root.site',
+                $siteAlias
+            );
+            $qb->andWhere($qb->expr()->eq(
+                "$siteAlias.slug",
+                $this->createNamedParameter($qb, $query['site']))
+            );
+        }
     }
 
     public function hydrate(Request $request, EntityInterface $entity,

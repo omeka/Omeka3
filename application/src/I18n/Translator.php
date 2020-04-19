@@ -1,9 +1,9 @@
 <?php
 namespace Omeka\I18n;
 
+use Laminas\I18n\Translator\TranslatorAwareInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Omeka\Stdlib\MessageInterface;
-use Zend\I18n\Translator\TranslatorAwareInterface;
-use Zend\I18n\Translator\TranslatorInterface;
 
 class Translator implements TranslatorInterface
 {

@@ -2,14 +2,14 @@
 namespace Omeka\File;
 
 use finfo;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\Math\Rand;
 use Omeka\Api\Request;
 use Omeka\Entity\Media;
 use Omeka\File\Store\StoreInterface;
 use Omeka\Stdlib\ErrorStore;
 use XMLReader;
-use Zend\EventManager\Event;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Math\Rand;
 
 class TempFile
 {

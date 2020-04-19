@@ -5,9 +5,9 @@ use DateTimeZone;
 use Omeka\Form\Element\SiteSelect;
 use Omeka\Form\Element\RestoreTextarea;
 use Omeka\Settings\Settings;
-use Zend\Form\Form;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\EventManager\Event;
+use Laminas\Form\Form;
+use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\Event;
 
 class SettingForm extends Form
 {
@@ -34,6 +34,9 @@ class SettingForm extends Form
         'application/vnd.oasis.opendocument.presentation',
         'application/vnd.oasis.opendocument.spreadsheet',
         'application/vnd.oasis.opendocument.text',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/x-gzip',
         'application/x-ms-wmp',
         'application/x-msdownload',
@@ -54,6 +57,7 @@ class SettingForm extends Form
         // image/*
         'image/bmp',
         'image/gif',
+        'image/jp2',
         'image/jpeg',
         'image/pjpeg',
         'image/png',

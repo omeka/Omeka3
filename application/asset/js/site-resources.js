@@ -9,5 +9,15 @@
                 advancedSearch.removeClass('inactive');
             }
         });
+
+        Omeka.initializeSelector('#site-item-sets', '#item-set-selector');
+
+        $('#resources-preview-button').on('click', function(e) {
+            e.preventDefault();
+            var url = $(this).data('url');
+            var query = $('#site-form').serialize();
+            window.open(`${url}?${query}`, '_blank');
+        });
+
     });
 })(jQuery)

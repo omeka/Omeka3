@@ -4,7 +4,7 @@ $escape = $this->plugin('escapeHtml');
 $formLabel = $this->plugin('formLabel');
 $formElement = $this->plugin('formElement');
 $this->htmlElement('body')->appendAttribute('class', 'edit media');
-$this->headScript()->appendFile($this->assetUrl('js/resource-form.js', 'Omeka'));
+$this->headScript()->appendFile($this->assetUrl('js/resource-form.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
 $form->prepare();
 $mediaForm = $this->media()->updateForm($media);
 

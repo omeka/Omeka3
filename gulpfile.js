@@ -267,6 +267,7 @@ function zipDistDir(source = null, destination = null, zipname = null, done) {
         '!./package-lock.json',
         '!./**/.tx/**',
         '!./.php_cs',
+        '!./.php_cs_module',
         '!./.php_cs.cache',
         '!./.travis.yml',
         '!./gulpfile.js',
@@ -322,15 +323,7 @@ taskCssModuleWatch.flags = {'--module-name': 'Folder name of the module to watch
 gulp.task('css:module:watch', taskCssModuleWatch);
 
 function taskTestCs() {
-    return ensureBuildDir().then(function () {
-        return runCommand('vendor/bin/php-cs-fixer', [
-            'fix',
-            '--dry-run',
-            '--verbose',
-            '--diff',
-            '--cache-file=build/cache/.php_cs.cache'
-        ]);
-    });
+    return phpCsFixer(false);
 }
 taskTestCs.description = 'Check code standards';
 gulp.task('test:cs', taskTestCs);
@@ -346,6 +339,24 @@ function taskTestModuleCs() {
 taskTestModuleCs.description = 'Check code standards for a module';
 taskTestModuleCs.flags = {'--module-name': 'Folder name of the module to check'};
 gulp.task('test:module:cs', taskTestModuleCs);
+
+function taskFixCs() {
+    return phpCsFixer(true);
+}
+taskFixCs.description = 'Fix code standards';
+gulp.task('fix:cs', taskFixCs);
+
+function taskFixModuleCs() {
+    return ensureBuildDir()
+        .then(getModulePath)
+        .then(function (modulePath) {
+            return phpCsFixer(true, modulePath);
+        }
+    );
+}
+taskFixModuleCs.description = 'Fix code standards for a module';
+taskFixModuleCs.flags = {'--module-name': 'Folder name of the module to fix'};
+gulp.task('fix:module:cs', taskFixModuleCs);
 
 function taskTestPhp() {
     return ensureBuildDir().then(function () {

@@ -24,13 +24,6 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter imple
             ]]]);
         }
 
-        if (isset($query['id']) && is_numeric($query['id'])) {
-            $qb->andWhere($qb->expr()->eq(
-                'omeka_root.id',
-                $this->createNamedParameter($qb, $query['id'])
-            ));
-        }
-
         if (isset($query['owner_id']) && is_numeric($query['owner_id'])) {
             $userAlias = $this->createAlias();
             $qb->innerJoin(
@@ -165,7 +158,7 @@ abstract class AbstractResourceEntityAdapter extends AbstractEntityAdapter imple
                 );
                 if (!$propExists) {
                     $errorStore->addError('o:resource_template_property', new Message(
-                        'The "%s" resource template requires a "%s" value', // @translate
+                        'The "%1$s" resource template requires a "%2$s" value', // @translate
                         $resourceTemplate->getLabel(),
                         $requiredProp->getAlternateLabel()
                             ? $requiredProp->getAlternateLabel()

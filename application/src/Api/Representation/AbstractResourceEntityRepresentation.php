@@ -113,6 +113,7 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
                 'o:resource_template' => $resourceTemplate,
                 'o:thumbnail' => $thumbnail,
                 'o:title' => $this->title(),
+                'thumbnail_display_urls' => $this->thumbnailDisplayUrls(),
             ],
             $dateTime,
             $this->getResourceJsonLd(),
@@ -170,7 +171,13 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
      */
     public function title()
     {
-        return $this->resource->getTitle();
+        $title = $this->resource->getTitle();
+
+        $eventManager = $this->getEventManager();
+        $args = $eventManager->prepareArgs(['title' => $title]);
+        $eventManager->trigger('rep.resource.title', $this, $args);
+
+        return $args['title'];
     }
 
     /**
@@ -262,7 +269,7 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
         $values = [];
         foreach ($this->resource->getValues() as $valueEntity) {
             $value = new ValueRepresentation($valueEntity, $this->getServiceLocator());
-            if ('resource' === $value->type() && null === $value->valueResource()) {
+            if ($value->isHidden()) {
                 // Skip this resource value if the resource is not available
                 // (most likely because it is private).
                 continue;
@@ -302,30 +309,25 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
      *
      * @param string $term The prefix:local_part
      * @param array $options
-     * - type: (null) Get values of this type only. Valid types are "literal",
-     *   "uri", and "resource". Returns all types by default.
+     * - type (array|string): Get values of these types only. Default types are
+     *   "literal", "uri", "resource", "resource:item", "resource:media" and
+     *   "resource:itemset". Returns all types by default.
      * - all: (false) If true, returns all values that match criteria. If false,
      *   returns the first matching value.
      * - default: (null) Default value if no values match criteria. Returns null
-     *   by default.
-     * - lang: (null) Get values of this language only. Returns values of all
-     *   languages by default.
+     *   by default for single result, empty array for all results.
+     * - lang (array|string): Get values of these languages only. Returns values
+     *   of all languages by default. Use `['']` to get values without language.
      * @return ValueRepresentation|ValueRepresentation[]|mixed
      */
     public function value($term, array $options = [])
     {
         // Set defaults.
-        if (!isset($options['type'])) {
-            $options['type'] = null;
-        }
         if (!isset($options['all'])) {
             $options['all'] = false;
         }
         if (!isset($options['default'])) {
-            $options['default'] = null;
-        }
-        if (!isset($options['lang'])) {
-            $options['lang'] = null;
+            $options['default'] = $options['all'] ? [] : null;
         }
 
         if (!$this->getAdapter()->isTerm($term)) {
@@ -336,17 +338,29 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
             return $options['default'];
         }
 
+        if (empty($options['type'])) {
+            $types = false;
+        } elseif (is_array($options['type'])) {
+            $types = $options['type'];
+        } else {
+            $types = [$options['type']];
+        }
+
+        if (empty($options['lang'])) {
+            $langs = false;
+        } elseif (is_array($options['lang'])) {
+            $langs = $options['lang'];
+        } else {
+            $langs = [$options['lang']];
+        }
+
         // Match only the representations that fit all the criteria.
         $matchingValues = [];
         foreach ($this->values()[$term]['values'] as $value) {
-            if (!is_null($options['type'])
-                && $value->type() !== $options['type']
-            ) {
+            if ($types && !in_array($value->type(), $types)) {
                 continue;
             }
-            if (!is_null($options['lang'])
-                && $value->lang() !== $options['lang']
-            ) {
+            if ($langs && !in_array($value->lang(), $langs)) {
                 continue;
             }
             $matchingValues[] = $value;
@@ -413,9 +427,9 @@ abstract class AbstractResourceEntityRepresentation extends AbstractEntityRepres
     public function objectValues()
     {
         $objectValues = [];
-        foreach ($this->values() as $term => $property) {
+        foreach ($this->values() as $property) {
             foreach ($property['values'] as $value) {
-                if ('resource' == $value->type()) {
+                if (strtok($value->type(), ':') === 'resource') {
                     $objectValues[] = $value;
                 }
             }

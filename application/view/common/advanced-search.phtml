@@ -2,9 +2,9 @@
 $this->headLink()->prependStylesheet($this->assetUrl('css/advanced-search.css', 'Omeka'));
 $this->headScript()->appendFile($this->assetUrl('js/advanced-search.js', 'Omeka'));
 
-$query = isset($query) ? $query : null;
-$resourceType = isset($resourceType) ? $resourceType : null;
-$isPool = isset($isPool) ? $isPool : null;
+$query = $query ?? null;
+$resourceType = $resourceType ?? null;
+$isPool = $isPool ?? null;
 
 $partials = [
     'common/advanced-search/fulltext',

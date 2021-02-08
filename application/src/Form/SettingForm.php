@@ -173,7 +173,7 @@ class SettingForm extends Form
             'type' => 'Select',
             'options' => [
                 'label' => 'Property label information', // @translate
-                'info' => 'The additional information that accompanies labels on resource pages.', // @translate
+                'info' => 'The additional information that accompanies labels on admin resource pages.', // @translate
                 'value_options' => [
                     'none' => 'None', // @translate
                     'vocab' => 'Show Vocabulary', // @translate
@@ -181,7 +181,7 @@ class SettingForm extends Form
                 ],
             ],
             'attributes' => [
-                'value' => $this->settings->get('property_label_information'),
+                'value' => $this->settings->get('property_label_information', 'none'),
                 'id' => 'property_label_information',
             ],
         ]);
